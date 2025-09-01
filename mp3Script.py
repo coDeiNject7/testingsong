@@ -182,9 +182,12 @@ def download_playlist_dynamic(playlist_url):
 
     # Replace file paths in metadata with release URLs
     for song_meta in metadata_collection:
-        title = song_meta["title"]
-        song_meta["file"] = asset_urls.get(f"{title}.mp3")
-        song_meta["album_art"] = asset_urls.get(f"{title}.jpg")
+        sanitized_title = sanitize_filename(song_meta["title"])
+        for asset_name, url in asset_urls.items():
+            if asset_name.endswith(".mp3") and sanitize_filename(asset_name[:-4]) == sanitized_title:
+                song_meta["file"] = url
+            if asset_name.endswith(".jpg") and sanitize_filename(asset_name[:-4]) == sanitized_title:
+                song_meta["album_art"] = url
 
     # Save updated metadata
     with open(META_FILE, "w", encoding="utf-8") as f:
