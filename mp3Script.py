@@ -4,6 +4,7 @@ import requests
 import json
 import re
 import multiprocessing
+import unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from mutagen.id3 import ID3, USLT, APIC, error
 from mutagen.mp3 import MP3
@@ -23,8 +24,11 @@ metadata_collection = []
 # Helpers
 # -----------------------
 def sanitize_filename(name):
-    sanitized = re.sub(r'[<>:"/\|?*\n\r\t]', '_', name).strip()
-    print(f"[sanitize_filename] Title: {name}\n              Sanitized: {sanitized}")
+    # Normalize Unicode (convert fullwidth punctuation to ascii, etc)
+    normalized = unicodedata.normalize("NFKC", name)
+    # Replace Windows unsafe chars
+    sanitized = re.sub(r'[<>:"/\\|?*\n\r\t]', '_', normalized).strip()
+    print(f"[sanitize_filename] Title: {repr(name)}\n              Normalized: {repr(normalized)}\n              Sanitized: {repr(sanitized)}")
     return sanitized
 
 def song_exists(title):
@@ -76,14 +80,14 @@ def download_audio(youtube_url, song_id):
         if song_exists(safe_title):
             print(f"⏩ Skipping {safe_title}: already exists")
             return
-        # Download audio
-        print(f"[yt-dlp download] yt-dlp -x --audio-format mp3 -o {SONGS_DIR}/%(title)s.%(ext)s {youtube_url}")
+        # Download audio with sanitized output template
+        # Use safe_title in output to ensure consistent filenames
         subprocess.run([
             "yt-dlp", "-x", "--audio-format", "mp3",
-            "-o", f"{SONGS_DIR}/%(title)s.%(ext)s", youtube_url
+            "-o", f"{SONGS_DIR}/{safe_title}.%(ext)s", youtube_url
         ], check=True)
-        # After download, list files
         print(f"[Files in songs dir after download]: {os.listdir(SONGS_DIR)}")
+
         # Album art
         album_art_data = None
         if thumbnail_url:
@@ -95,19 +99,21 @@ def download_audio(youtube_url, song_id):
                 print(f"[download_audio] Saved album art: {album_art_path}")
             except Exception as e:
                 print(f"Error downloading album art: {e}")
+
         # Subtitles (lyrics)
         lyrics_texts = []
         for sub_lang in (data.get("subtitles") or {}).keys():
             subprocess.run([
                 "yt-dlp", "--skip-download", "--write-auto-sub",
                 "--convert-subs", "lrc", "--sub-lang", sub_lang,
-                "-o", f"{SONGS_DIR}/%(title)s.%(ext)s", youtube_url
+                "-o", f"{SONGS_DIR}/{safe_title}.%(ext)s", youtube_url
             ])
             lrc_file = os.path.join(SONGS_DIR, f"{safe_title}.lrc")
             if os.path.exists(lrc_file):
                 with open(lrc_file, "r", encoding="utf-8") as f:
                     lyrics_texts.append(f.read())
                 os.remove(lrc_file)
+
         embed_metadata(mp3_file, album_art_data, lyrics_texts)
         metadata_collection.append({
             "title": title,
