@@ -6,7 +6,7 @@ import re
 import multiprocessing
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from mutagen.id3 import ID3, USLT, APIC, error, TIT2, TPE1, TALB, TDRC, TCON, TXXX
+from mutagen.id3 import ID3, APIC, error, TIT2, TPE1, TALB, TDRC, TCON, TXXX
 from mutagen.mp3 import MP3
 
 # -----------------------
@@ -216,14 +216,14 @@ def create_github_release_and_upload_assets(tag_name="latest", release_name="Lat
     return asset_urls
 
 # -----------------------
-# GitHub Push
+# GitHub Push (metadata only)
 # -----------------------
-def push_to_github():
+def push_metadata_to_github():
     try:
-        subprocess.run(["git", "add", SONGS_DIR, META_FILE], check=True)
-        subprocess.run(["git", "commit", "-m", "Update songs + metadata"], check=True)
+        subprocess.run(["git", "add", META_FILE], check=True)
+        subprocess.run(["git", "commit", "-m", "Update metadata"], check=True)
         subprocess.run(["git", "push", "origin", GITHUB_BRANCH], check=True)
-        print("🚀 Pushed songs + metadata.")
+        print("🚀 Pushed metadata.json.")
     except Exception as e:
         print(f"⚠️ GitHub push failed: {e}")
 
@@ -231,7 +231,6 @@ def push_to_github():
 # Batch processing function
 # -----------------------
 def process_batch():
-    push_to_github()
     asset_urls = create_github_release_and_upload_assets()
 
     for song_meta in metadata_collection:
@@ -244,9 +243,7 @@ def process_batch():
                 song_meta["album_art"] = url
 
     save_metadata()
-    subprocess.run(["git", "add", META_FILE], check=True)
-    subprocess.run(["git", "commit", "-m", "Update metadata with release URLs"], check=True)
-    subprocess.run(["git", "push", "origin", GITHUB_BRANCH], check=True)
+    push_metadata_to_github()
 
 # -----------------------
 # Download Songs from JSON
