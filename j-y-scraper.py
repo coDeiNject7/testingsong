@@ -6,7 +6,7 @@ import re
 import multiprocessing
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from mutagen.id3 import ID3, APIC, error, TIT2, TPE1, TALB, TDRC, TCON, TXXX
+from mutagen.id3 import ID3, USLT, APIC, error, TIT2, TPE1, TALB, TDRC, TCON, TXXX
 from mutagen.mp3 import MP3
 
 # -----------------------
@@ -216,9 +216,9 @@ def create_github_release_and_upload_assets(tag_name="latest", release_name="Lat
     return asset_urls
 
 # -----------------------
-# GitHub Push (metadata only)
+# GitHub Push
 # -----------------------
-def push_metadata_to_github():
+def push_to_github():
     try:
         subprocess.run(["git", "add", META_FILE], check=True)
         subprocess.run(["git", "commit", "-m", "Update metadata"], check=True)
@@ -228,10 +228,22 @@ def push_metadata_to_github():
         print(f"⚠️ GitHub push failed: {e}")
 
 # -----------------------
+# Cleanup local files
+# -----------------------
+def cleanup_local_files():
+    for filename in os.listdir(SONGS_DIR):
+        if filename.endswith((".mp3", ".jpg")):
+            try:
+                os.remove(os.path.join(SONGS_DIR, filename))
+                print(f"🗑️ Deleted local file: {filename}")
+            except Exception as e:
+                print(f"⚠️ Failed to delete {filename}: {e}")
+
+# -----------------------
 # Batch processing function
 # -----------------------
-def process_batch():
-    asset_urls = create_github_release_and_upload_assets()
+def process_batch(batch_num):
+    asset_urls = create_github_release_and_upload_assets(tag_name=f"batch-{batch_num}", release_name=f"Songs Batch {batch_num}")
 
     for song_meta in metadata_collection:
         safe_title = sanitize_filename(song_meta["song"])
@@ -243,7 +255,9 @@ def process_batch():
                 song_meta["album_art"] = url
 
     save_metadata()
-    push_metadata_to_github()
+    push_to_github()
+
+    cleanup_local_files()
 
 # -----------------------
 # Download Songs from JSON
@@ -261,6 +275,7 @@ def download_songs_from_json():
     print(f"▶ Resuming from index {start_index}, downloading {len(songs_to_download)} songs with {workers} workers...")
 
     batch_counter = 0
+    batch_num = (start_index // BATCH_SIZE) + 1
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [executor.submit(download_audio_from_json, entry, i) for entry, i in songs_to_download]
         for f in as_completed(futures):
@@ -268,12 +283,13 @@ def download_songs_from_json():
             batch_counter += 1
 
             if batch_counter % BATCH_SIZE == 0:
-                print(f"\n🚀 Processing batch of {BATCH_SIZE} songs...")
-                process_batch()
+                print(f"\n🚀 Processing batch {batch_num}...")
+                process_batch(batch_num)
+                batch_num += 1
 
     if batch_counter % BATCH_SIZE != 0:
-        print("\n🚀 Processing final batch...")
-        process_batch()
+        print(f"\n🚀 Processing final batch {batch_num}...")
+        process_batch(batch_num)
 
 # -----------------------
 # Run
