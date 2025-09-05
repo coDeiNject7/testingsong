@@ -19,25 +19,26 @@ os.makedirs(SONGS_DIR, exist_ok=True)
 GITHUB_USER = "coDeiNject7"
 GITHUB_REPO = "testingsong"
 GITHUB_BRANCH = "main"
-BATCH_SIZE = 10  # Push & release after every 10 songs
+BATCH_SIZE = 10
 
 # -----------------------
 # Load existing metadata (for resume)
 # -----------------------
-if os.path.exists(META_FILE):
-    with open(META_FILE, "r", encoding="utf-8") as f:
-        meta_data = json.load(f)
-        metadata_collection = meta_data.get("songs", [])
-        last_index = meta_data.get("last_index", -1)
-else:
-    metadata_collection = []
-    last_index = -1
+def load_metadata():
+    if os.path.exists(META_FILE):
+        with open(META_FILE, "r", encoding="utf-8") as f:
+            meta_data = json.load(f)
+            return meta_data.get("songs", []), meta_data.get("last_index", -1)
+    else:
+        return [], -1
+
+metadata_collection, last_index = load_metadata()
 
 # -----------------------
-# Load Songs JSON (limit 100)
+# Load Songs JSON (limit 100, but don't truncate file)
 # -----------------------
 with open(SONGS_JSON, "r", encoding="utf-8") as f:
-    songs_data = json.load(f)[:100]   # Take only first 100
+    songs_data = json.load(f)
 
 # -----------------------
 # Helpers
@@ -51,7 +52,7 @@ def save_metadata():
 
 def sanitize_filename(name):
     normalized = unicodedata.normalize("NFKC", name)
-    sanitized = re.sub(r'[<>:"/\\|?*\n\r\t]', '_', normalized).strip()
+    sanitized = re.sub(r'[<>:"/\|?*\n\r\t]', '_', normalized).strip()
     return sanitized
 
 def song_exists(title):
@@ -73,24 +74,20 @@ def embed_metadata(mp3_file, song_entry, album_art_data=None):
             audio.add_tags()
         except error:
             pass
-
         audio.tags.add(TIT2(encoding=3, text=song_entry.get("song", "")))
         audio.tags.add(TPE1(encoding=3, text=song_entry.get("artists", "")))
         audio.tags.add(TALB(encoding=3, text=song_entry.get("movie", "")))
         audio.tags.add(TDRC(encoding=3, text=song_entry.get("year", "")))
         if song_entry.get("genre"):
             audio.tags.add(TCON(encoding=3, text=song_entry.get("genre")))
-
         audio.tags.add(TXXX(encoding=3, desc="Composers", text=song_entry.get("composers", "")))
         audio.tags.add(TXXX(encoding=3, desc="Language", text=song_entry.get("language", "")))
         audio.tags.add(TXXX(encoding=3, desc="Duration", text=song_entry.get("duration", "")))
         audio.tags.add(TXXX(encoding=3, desc="Label", text=song_entry.get("label", "")))
-
         if album_art_data:
             audio.tags.add(APIC(
                 encoding=3, mime="image/jpeg", type=3, desc="Cover", data=album_art_data
             ))
-
         audio.save()
     except Exception as e:
         print(f"Error embedding metadata for {mp3_file}: {e}")
@@ -105,15 +102,12 @@ def download_audio_from_json(song_entry, song_id):
         song_name = song_entry["song"]
         safe_title = sanitize_filename(song_name)
         mp3_file = os.path.join(SONGS_DIR, f"{safe_title}.mp3")
-
         if song_exists(safe_title) or already_in_metadata(song_name):
             print(f"⏩ Skipping {song_name}: already downloaded.")
             last_index = song_id
             save_metadata()
             return
-
         print(f"[download_audio] Will save mp3 as: {mp3_file}")
-
         cmd_info = ["yt-dlp", "--skip-download", "--print-json", youtube_url]
         result = subprocess.run(cmd_info, capture_output=True, text=True)
         if result.returncode != 0:
@@ -121,12 +115,10 @@ def download_audio_from_json(song_entry, song_id):
             return
         data = json.loads(result.stdout.strip().split("\n")[-1])
         thumbnail_url = data.get("thumbnail")
-
         subprocess.run([
             "yt-dlp", "-x", "--audio-format", "mp3",
             "-o", f"{SONGS_DIR}/{safe_title}.%(ext)s", youtube_url
         ], check=True)
-
         album_art_data = None
         if thumbnail_url:
             try:
@@ -136,9 +128,7 @@ def download_audio_from_json(song_entry, song_id):
                     f.write(album_art_data)
             except Exception as e:
                 print(f"Error downloading album art: {e}")
-
         embed_metadata(mp3_file, song_entry, album_art_data)
-
         entry_with_release = dict(song_entry)
         entry_with_release.update({
             "file": None,
@@ -147,7 +137,6 @@ def download_audio_from_json(song_entry, song_id):
         metadata_collection.append(entry_with_release)
         last_index = song_id
         save_metadata()
-
         print(f"✅ Downloaded & processed: {song_name}")
     except Exception as e:
         print(f"Error processing {song_entry.get('youtube')}: {e}")
@@ -160,13 +149,11 @@ def create_github_release_and_upload_assets(tag_name="latest", release_name="Lat
     if not token:
         print("❌ GitHub token not found.")
         return {}
-
     headers = {
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github+json"
     }
     api_base = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}"
-
     r = requests.get(f"{api_base}/releases/tags/{tag_name}", headers=headers)
     if r.status_code == 200:
         release = r.json()
@@ -185,18 +172,15 @@ def create_github_release_and_upload_assets(tag_name="latest", release_name="Lat
             return {}
         release = r.json()
         print(f"✅ Created new release: {tag_name}")
-
-    upload_url = release["upload_url"].split("{")[0]
+    upload_url = release["upload_url"].split("{")
     existing_assets = {a["name"]: a["browser_download_url"] for a in release.get("assets", [])}
     asset_urls = existing_assets.copy()
-
     for filename in os.listdir(SONGS_DIR):
         if not filename.endswith((".mp3", ".jpg")):
             continue
         if filename in existing_assets:
             print(f"⏩ Skipping upload, already exists: {filename}")
             continue
-
         file_path = os.path.join(SONGS_DIR, filename)
         mime_type = "audio/mpeg" if filename.endswith(".mp3") else "image/jpeg"
         with open(file_path, "rb") as f:
@@ -212,7 +196,6 @@ def create_github_release_and_upload_assets(tag_name="latest", release_name="Lat
             print(f"📤 Uploaded: {filename}")
         else:
             print(f"❌ Failed upload: {filename} -> {response.json()}")
-
     return asset_urls
 
 # -----------------------
@@ -244,7 +227,6 @@ def cleanup_local_files():
 # -----------------------
 def process_batch(batch_num):
     asset_urls = create_github_release_and_upload_assets(tag_name=f"batch-{batch_num}", release_name=f"Songs Batch {batch_num}")
-
     for song_meta in metadata_collection:
         safe_title = sanitize_filename(song_meta["song"])
         for asset_name, url in asset_urls.items():
@@ -253,27 +235,24 @@ def process_batch(batch_num):
                 song_meta["file"] = url
             elif asset_name.endswith(".jpg") and compare_name == safe_title:
                 song_meta["album_art"] = url
-
     save_metadata()
     push_to_github()
-
     cleanup_local_files()
 
 # -----------------------
 # Download Songs from JSON
 # -----------------------
 def download_songs_from_json():
-    global last_index
+    global last_index, metadata_collection
+    # Always reload all metadata before each batch to preserve all data
+    metadata_collection, last_index = load_metadata()
     start_index = last_index + 1
     songs_to_download = [(entry, i) for i, entry in enumerate(songs_data) if i >= start_index]
-
     if not songs_to_download:
         print("✅ All songs already processed.")
         return
-
     workers = max(1, min(multiprocessing.cpu_count() - 1, 5))
     print(f"▶ Resuming from index {start_index}, downloading {len(songs_to_download)} songs with {workers} workers...")
-
     batch_counter = 0
     batch_num = (start_index // BATCH_SIZE) + 1
     with ThreadPoolExecutor(max_workers=workers) as executor:
@@ -281,13 +260,15 @@ def download_songs_from_json():
         for f in as_completed(futures):
             f.result()
             batch_counter += 1
-
             if batch_counter % BATCH_SIZE == 0:
+                # Always reload metadata before batch finalization, then save
+                metadata_collection, last_index = load_metadata()
                 print(f"\n🚀 Processing batch {batch_num}...")
                 process_batch(batch_num)
                 batch_num += 1
-
     if batch_counter % BATCH_SIZE != 0:
+        # Always reload metadata before final batch, then save
+        metadata_collection, last_index = load_metadata()
         print(f"\n🚀 Processing final batch {batch_num}...")
         process_batch(batch_num)
 

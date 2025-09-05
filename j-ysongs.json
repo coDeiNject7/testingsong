@@ -48,16 +48,16 @@
     "youtube": "https://www.youtube.com/watch?v=x14I1FCUdQo"
   },
   {
-    "song": "Cotton Candy",
-    "movie": "Cotton Candy",
-    "year": "2024",
-    "artists": "Chandan Shetty",
-    "composers": "Chandan Shetty",
+    "song": "Nooru Janmaku",
+    "movie": "America America",
+    "year": "2020",
+    "artists": "Mano Murthy",
+    "composers": "Mano Murthy",
     "language": "kannada",
-    "duration": "192",
-    "label": "CS Records",
+    "duration": "259",
+    "label": "Jhankar Music",
     "genre": null,
-    "youtube": "https://www.youtube.com/watch?v=vmu53OX935A"
+    "youtube": "https://www.youtube.com/watch?v=pFt58gtRgiM"
   },
   {
     "song": "Mayavi (From &quot;Bhoomi 2024&quot;)",
@@ -72,16 +72,40 @@
     "youtube": "https://www.youtube.com/watch?v=TMY1g8pAktk"
   },
   {
-    "song": "Nooru Janmaku",
-    "movie": "America America",
-    "year": "2020",
-    "artists": "Mano Murthy",
+    "song": "Cotton Candy",
+    "movie": "Cotton Candy",
+    "year": "2024",
+    "artists": "Chandan Shetty",
+    "composers": "Chandan Shetty",
+    "language": "kannada",
+    "duration": "192",
+    "label": "CS Records",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=vmu53OX935A"
+  },
+  {
+    "song": "Mathu Nannolu",
+    "movie": "Gaja",
+    "year": "2007",
+    "artists": "Sonu Nigam, Shreya Goshal, V. Harikrishna",
+    "composers": "V. Harikrishna",
+    "language": "kannada",
+    "duration": "312",
+    "label": "Ashwini Recording Company",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=U7T4eTdSucY"
+  },
+  {
+    "song": "Matinalli Helalarenu",
+    "movie": "Bombat",
+    "year": "2009",
+    "artists": "Sonu Nigam",
     "composers": "Mano Murthy",
     "language": "kannada",
-    "duration": "259",
-    "label": "Jhankar Music",
+    "duration": "324",
+    "label": "T-Series",
     "genre": null,
-    "youtube": "https://www.youtube.com/watch?v=pFt58gtRgiM"
+    "youtube": "https://www.youtube.com/watch?v=z4y2BhA76Ko"
   },
   {
     "song": "Minchagi Neenu",
@@ -96,27 +120,123 @@
     "youtube": "https://www.youtube.com/watch?v=zecRgZYi-kw"
   },
   {
-    "song": "Mathu Nannolu",
-    "movie": "Gaja",
-    "year": "2007",
+    "song": "Badass",
+    "movie": "Leo (Kannada) (Original Motion Picture Soundtrack)",
+    "year": "2023",
+    "artists": "Anirudh Ravichander, Sri Krishna, Sai Charan",
+    "composers": "Anirudh Ravichander",
+    "language": "kannada",
+    "duration": "230",
+    "label": "Sony Music Entertainment India Pvt. Ltd.",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=LN32MYG01rg"
+  },
+  {
+    "song": "Upavasa",
+    "movie": "Mr. and Mrs. Ramachari",
+    "year": "2014",
+    "artists": "Sonu Nigam, Shreya Ghoshal, V. Harikrishna, Ghouse Peer",
+    "composers": "V. Harikrishna, Shreya Ghoshal, Ghouse Peer, Sonu Nigam",
+    "language": "kannada",
+    "duration": "245",
+    "label": "D Beats",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=iPOCZdhEf28"
+  },
+  {
+    "song": "O Gunavantha",
+    "movie": "Jothe Jotheyali",
+    "year": "2006",
     "artists": "Sonu Nigam, Shreya Goshal, V. Harikrishna",
     "composers": "V. Harikrishna",
     "language": "kannada",
-    "duration": "312",
+    "duration": "262",
     "label": "Ashwini Recording Company",
     "genre": null,
-    "youtube": "https://www.youtube.com/watch?v=ce_8oho9AaA"
+    "youtube": "https://www.youtube.com/watch?v=bTJHgrGZnS4"
   },
   {
-    "song": "Matinalli Helalarenu",
-    "movie": "Bombat",
-    "year": "2009",
-    "artists": "Sonu Nigam",
-    "composers": "Mano Murthy",
+    "song": "Bangaradinda",
+    "movie": "Preethsod Thappa...?",
+    "year": "1998",
+    "artists": "Hamsalekha, K.J. Yesudas, Anuradha Sriram",
+    "composers": "Hamsalekha",
     "language": "kannada",
-    "duration": "324",
-    "label": "T-Series",
+    "duration": "288",
+    "label": "Magnasound",
     "genre": null,
-    "youtube": "https://www.youtube.com/watch?v=z4y2BhA76Ko"
+    "youtube": "https://www.youtube.com/watch?v=6BIRYz1MjXw"
+  },
+  {
+    "song": "Dwapara",
+    "movie": "Krishnam Pranaya Sakhi (Original Motion Picture Soundtrack)",
+    "year": "2024",
+    "artists": "Arjun Janya, V.Nagendra Prasad, Jaskaran Singh",
+    "composers": "Jaskaran Singh, V.Nagendra Prasad, Arjun Janya",
+    "language": "kannada",
+    "duration": "283",
+    "label": "Aananda Audio Video",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=M8iZ5W6TZpA"
+  },
+  {
+    "song": "Singara Siriye (From &quot;Kantara&quot;)",
+    "movie": "Kantara",
+    "year": "2022",
+    "artists": "B. Ajaneesh Loknath, Pramod Maravanthe, Vijay Prakash, Ananya Bhat, Nagraj Panar Valtur",
+    "composers": "B. Ajaneesh Loknath, Vijay Prakash, Ananya Bhat, Nagraj Panar Valtur, Ashwath, Pramod Maravanthe, Balaji Sri, Deva, Ronnie Raphael",
+    "language": "kannada",
+    "duration": "281",
+    "label": "Divo TV Private Limited",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=3XShkcOze3s"
+  },
+  {
+    "song": "Preethi Neenillade",
+    "movie": "Baava Baamaida",
+    "year": "2001",
+    "artists": "Sonu Nigam, K. S. Chithra",
+    "composers": "Hamsalekha",
+    "language": "kannada",
+    "duration": "336",
+    "label": "Mars Inc / Akash Audio",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=35AkUNqq3X8"
+  },
+  {
+    "song": "Neenaade Naa",
+    "movie": "Yuvarathnaa - Kannada",
+    "year": "2020",
+    "artists": "Ghouse Peer, Thaman S, Armaan Malik, Shreya Ghoshal",
+    "composers": "Thaman S, Armaan Malik, Shreya Ghoshal, Ghouse Peer",
+    "language": "kannada",
+    "duration": "252",
+    "label": "Divo TV Private Limited",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=3s5XyooFGpg"
+  },
+  {
+    "song": "Avarivarajothe",
+    "movie": "Jarasandha",
+    "year": "2011",
+    "artists": "Sonu Nigam, Anuradha Bhat",
+    "composers": "Sonu Nigam, Anuradha Bhat, Arjun Janya",
+    "language": "kannada",
+    "duration": "253",
+    "label": "Think Music Kannada",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=QwcutIDqDPA"
+  },
+  {
+    "song": "Ninna Gungalli",
+    "movie": "Ninna Gungalli",
+    "year": "2019",
+    "artists": "Adhvik",
+    "composers": "Adhvik",
+    "language": "kannada",
+    "duration": "195",
+    "label": "DC Records",
+    "genre": null,
+    "youtube": "https://www.youtube.com/watch?v=iLf_yqF9VjA"
   }
 ]
